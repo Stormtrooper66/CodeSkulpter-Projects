@@ -1,0 +1,586 @@
+##Snake Game
+
+import simplegui
+import random
+##Board Map
+##Easy,Medium,Hard,Extreme,Wierd,Tunnel,Portal,blocky,Railroad,Multiplayer
+difficulty = input("Easy,Medium,Hard,Extreme,Wierd,Tunnel,Portal,\nBlocky,RR(Rail Road),Muli(multiplayer)")
+##Starting speed
+speed_setting = 5
+##how much is gained per block reached
+add = 5
+##Head starting point(must be a multiple of 20)
+starting_point = [20,20]
+
+if difficulty == "Easy" or difficulty == "easy":
+    sizex = 1000
+    sizey = 600
+if difficulty == "Medium" or difficulty == "medium":
+    sizex = 600
+    sizey = 600
+if difficulty == "Hard" or difficulty == "hard":
+    sizex = 400
+    sizey = 400
+if difficulty == "Extreme" or difficulty == "extreme":
+    sizex = 200
+    sizey = 200
+if difficulty == "Wierd" or difficulty == "wierd":
+    sizex = 1000
+    sizey = 600
+    wierd = True
+else:
+    wierd = False
+if difficulty == "Tunnel" or difficulty == "tunnel":
+    sizex = 1000
+    sizey = 600
+    tunnel = True
+else:
+    tunnel = False
+if difficulty == "Portal" or difficulty == "portal":
+    sizex = 1000
+    sizey = 600
+    portal = True
+else:
+    portal = False
+if difficulty == "Blocky" or difficulty == "blocky":
+    sizex = 1000
+    sizey = 600
+    blocky = True
+    xb = []
+    yb = []
+    num_spawned = int(input("Spawn how many?\n 100 reccommended"))
+else:
+    blocky = False
+if difficulty == "RR" or difficulty == "rr":
+    sizex = 1000
+    sizey = 600
+    train = True
+    xt = 1000
+    yt = 280
+else:
+    train = False
+if difficulty == "Multi" or difficulty == "multi":
+    sizex = 1000
+    sizey = 600
+    xp2 = [(starting_point[0] + 80)]
+    yp2 = [starting_point[1]]
+    multi = True
+    deadp2 = False
+    lengthp2 = 1
+    currentp2 = 0
+    directionp2 = " "
+    colorp2 = "	rgb(255,165,0)"
+    nump2 = 0
+    collected_by = 0
+    can_turnp2 = True
+else:
+    multi = False
+
+current = 0
+length = 1
+direction = " "
+directiontotal = [0]
+turn = [0,0," "]
+num = 0
+xa = 0
+ya = 0
+apple = 0
+color = "Yellow"
+time = 0
+dead = False
+d = [0,0]
+added = 0
+x = [starting_point[0]]
+y = [starting_point[1]]
+speed = speed_setting
+pause = False
+called_by = " "
+high_score = 1
+def retry():
+    global direction,directiontotal,turn,num,length,x,y,xa,ya,apple,color,dead,d
+    global added,speed,xb,yb,xp2,yp2,deadp2,lengthp2,currentp2,directionp2,colorp2,nump2,collected_by
+    if multi:
+        xp2 = [(starting_point[0] + 80)]
+        yp2 = [starting_point[1]]
+        deadp2 = False
+        lengthp2 = 1
+        currentp2 = 0
+        directionp2 = " "
+        colorp2 = "	rgb(255,165,0)"
+        nump2 = 0
+        collected_by = 0
+    direction = " "
+    directiontotal = [" "]
+    turn = [0,0," "]
+    num = 0
+    length = 1
+    x = [starting_point[0]]
+    y = [starting_point[1]]
+    xa = 0
+    ya = 0
+    xb = []
+    yb = []
+    apple = 0
+    color = "Yellow"
+    time = 0
+    dead = False
+    d = [0,0]
+    speed = speed_setting
+    if blocky:
+        blocks.gen_barriers()
+def keydown(in0):
+    global directiontotal,turn,x,y,can_turn,pause,directionp2,can_turnp2
+    in0 -= 37
+    if can_turn:
+        if in0 == 0 and directiontotal[0] != "right":
+            directiontotal[0] = "left"
+        if in0 == 1 and directiontotal[0] != "down":
+            directiontotal[0] = "up"
+        if in0 == 2 and directiontotal[0] != "left":
+            directiontotal[0] = "right"
+        if in0 == 3 and directiontotal[0] != "up":
+            directiontotal[0] = "down"
+        can_turn = False
+    if multi:
+        if can_turnp2:
+            if in0 == 50:
+                if multi and directionp2 != "down":
+                    directionp2 = "up"
+                    can_turnp2 = False
+            if in0 == 28:
+                if not multi:
+                    segment.slide_left()
+                if multi and directionp2 != "right":
+                    directionp2 = "left"
+                    can_turnp2 = False
+            if in0 == 46:
+                if not multi:
+                        segment.slide_right()
+                if multi and directionp2 != "up":
+                    directionp2 = "down"
+                    can_turnp2 = False
+            if in0 == 31:
+                if multi and directionp2 != "left":
+                    directionp2 = "right"
+                    can_turnp2 = False
+    if in0 == 45:
+        retry()
+    if in0 == 43 and not pause:
+        pause = True
+    elif in0 == 43 and pause:
+        pause = False
+    if in0 == 34:
+        gen_apple()
+def gen_apple():
+    global xa,ya,called_by
+    xa = random.randrange(1,(sizex / 20))
+    ya = random.randrange(1,(sizey / 20))
+    xa = xa * 20
+    ya = ya * 20
+    called_by = "gen_apple"
+    bug_stopper()
+def bug_stopper():
+    global called_by
+    if wierd:
+        if (xa >= 300 and xa <= 680) and ya <= 380:
+            gen_apple()
+    if tunnel:
+        if (xa >= 300 and xa <= 680) and ya <= 260:
+            gen_apple()
+        if (xa >= 300 and xa <= 680) and ya >= 320:
+            gen_apple()
+    if portal:
+        if xa >= 300 and xa <= 680:
+            gen_apple()
+    if blocky:
+        for cur in range (0,(len(xb) - 1)):
+            if xa == xb[cur] and xb == yb[cur]:
+                gen_apple()
+                break
+            cur += 1
+    if called_by == "gen_apple":
+        for cur in range (2,len(x)):
+            if xa == x[cur] and ya == y[cur]:
+                gen_apple()
+            cur += 1
+        called_by = " "
+def test_dead():
+    global color,directiontotal,dead,x,y
+    cur = 1
+    if x[0] == -20 or y[0] == -20 or x[0] == sizex or y[0] == sizey:
+        die()
+    if multi:
+        if xp2[0] == -20 or yp2[0] == -20 or xp2[0] == sizex or yp2[0] == sizey:
+            diep2()
+        if xp2[0] == x[0] and yp2[0] == y[0]:
+            diep2()
+        if x[0] == xp2[0] and y[0] == yp2[0]:
+            die()
+        for cur in range (2,len(xp2)):
+            if xp2[0] == xp2[cur] and yp2[0] == yp2[cur]:
+                diep2()
+            cur += 1
+        for cur in range (2,len(x)):
+            if xp2[0] == x[cur] and yp2[0] == y[cur]:
+                diep2()
+            cur += 1
+        for cur in range (2,len(xp2)):
+            if x[0] == xp2[cur] and y[0] == yp2[cur]:
+                die()
+            cur += 1
+    if wierd:
+        if x[0] == 300 and y[0] <= 380:
+            die()
+        if (x[0] >= 300 and x[0] <= 680) and y[0] == 380:
+            die()
+        if x[0] == 680 and y[0] <= 380:
+            die()
+    if tunnel:
+        if x[0] == 300 and y[0] <= 260:
+            die()
+        if (x[0] >= 300 and x[0] <= 680) and y[0] == 260:
+            die()
+        if x[0] == 680 and y[0] <= 260:
+            die()
+        if x[0] == 300 and y[0] >= 320:
+            die()
+        if (x[0] >= 300 and x[0] <= 680) and y[0] == 320:
+            die()
+        if x[0] == 680 and y[0] >= 320:
+            die()
+    if portal:
+        if x[0] == 300 and (y[0] >= 20 and y[0] <= 260):
+            die()
+        if x[0] == 680 and (y[0] >= 20 and y[0] <= 260):
+            die()
+        if x[0] == 300 and (y[0] >= 320 and y[0] <= 560):
+            die()
+        if x[0] == 680 and (y[0] >= 320 and y[0] <= 560):
+            die()
+    if blocky:
+        for cur in range (0,(len(xb) - 1)):
+            if x[0] == xb[cur] and y[0] == yb[cur]:
+                die()
+            cur += 1
+    if train:
+        if (x[0] >= xt and x[0] <= (xt + 900)) and (y[0] >= yt and y[0] <= (yt + 59)):
+                die()
+        for cur in range (0,(len(x) - 1)):
+            if (x[(cur - 1)] >= xt and x[(cur - 1)] <= (xt + 900)) and (y[(cur - 1)] >= yt and y[(cur - 1)] <= (yt + 59)):
+                die()
+            cur += 1
+    for cur in range (2,len(x)):
+        if x[0] == x[cur] and y[0] == y[cur]:
+            die()
+        cur += 1
+def die():
+    global color,dead,direction
+    color = "Black"
+    dead = True
+    direction = " "
+def diep2():
+    global colorp2,deadp2,directionp2
+    colorp2 = "Black"
+    deadp2 = True
+    directionp2 = " "
+def test_tp():
+    if x[0] == 320 and y[0] == 0:
+        x.insert(0,700)
+        y.insert(0,0)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 320 and y[0] == 580:
+        x.insert(0,700)
+        y.insert(0,580)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 680 and y[0] == 0:
+        x.insert(0,300)
+        y.insert(0,0)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 680 and y[0] == 580:
+        x.insert(0,300)
+        y.insert(0,580)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 320 and y[0] == 280:
+        x.insert(0,700)
+        y.insert(0,280)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 680 and y[0] == 280:
+        x.insert(0,300)
+        y.insert(0,280)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 320 and y[0] == 300:
+        x.insert(0,700)
+        y.insert(0,300)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+    if x[0] == 680 and y[0] == 300:
+        x.insert(0,300)
+        y.insert(0,300)
+        x.pop((len(x) - 1))
+        y.pop((len(y) - 1))
+def collect():
+    global length,x,y,speed,high_score,collected_by,lengthp2
+    gen_apple()
+    if multi and collected_by == 2:
+        added = 0
+        lengthp2 += add
+        for added in range(0,add):    
+            xp2.append(xp2[0])
+            yp2.append(yp2[0])
+            added += 1
+        collected_by = 0
+        if lengthp2 > high_score:
+            high_score = lengthp2
+    else:
+        added = 0
+        length += add
+        for added in range(0,add):    
+            x.append(x[0])
+            y.append(y[0])
+            added += 1
+        if (length % 50) == 1 and speed > 1:
+                speed -= 1
+        if length > high_score:
+            high_score = length
+class segment:
+    def slide_right():
+        if directiontotal[0] == "left":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] - 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "right":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] + 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "up":
+            x.insert(0,(x[0] + 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "down":
+            x.insert(0,(x[0] + 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+    def slide_left():
+        if directiontotal[0] == "left":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] + 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "right":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] - 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "up":
+            x.insert(0,(x[0] - 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "down":
+            x.insert(0,(x[0] - 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+    def move():
+        if directiontotal[0] == "left":
+            x.insert(0,(x[0] - 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "right":
+            x.insert(0,(x[0] + 20))
+            y.insert(0,y[0])
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "up":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] - 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+        if directiontotal[0] == "down":
+            x.insert(0,x[0])
+            y.insert(0,(y[0] + 20))
+            x.pop((len(x) - 1))
+            y.pop((len(y) - 1))
+    def draw(canvas):
+        global x,y,current,num
+        for current in range (0,length):
+            xx = x[num] + 19
+            yy = y[num] + 19
+            canvas.draw_polygon([[x[num],y[num]],[xx,y[num]],[xx,yy],[x[num],yy]],1,"Yellow",color)
+            current += 1
+            if (len(x) - 1) > num:
+                num += 1
+            elif (len(x) - 1) == num:
+                num = 0
+    def movep2():
+        if directionp2 == "left":
+            xp2.insert(0,(xp2[0] - 20))
+            yp2.insert(0,yp2[0])
+            xp2.pop((len(xp2) - 1))
+            yp2.pop((len(yp2) - 1))
+        if directionp2 == "right":
+            xp2.insert(0,(xp2[0] + 20))
+            yp2.insert(0,yp2[0])
+            xp2.pop((len(xp2) - 1))
+            yp2.pop((len(yp2) - 1))
+        if directionp2 == "up":
+            xp2.insert(0,xp2[0])
+            yp2.insert(0,(yp2[0] - 20))
+            xp2.pop((len(xp2) - 1))
+            yp2.pop((len(yp2) - 1))
+        if directionp2 == "down":
+            xp2.insert(0,xp2[0])
+            yp2.insert(0,(yp2[0] + 20))
+            xp2.pop((len(xp2) - 1))
+            yp2.pop((len(yp2) - 1))
+    def drawp2(canvas):
+        global xp2,yp2,currentp2,nump2
+        for currentp2 in range (0,lengthp2):
+            xx = xp2[nump2] + 19
+            yy = yp2[nump2] + 19
+            canvas.draw_polygon([[xp2[nump2],yp2[nump2]],[xx,yp2[nump2]],[xx,yy],[xp2[nump2],yy]],1,"Yellow",colorp2)
+            currentp2 += 1
+            if (len(xp2) - 1) > nump2:
+                nump2 += 1
+            elif (len(xp2) - 1) == nump2:
+                nump2 = 0
+class blocks:
+    def gen_barriers():
+        global xb,yb
+        current = 1
+        for current in range (1,num_spawned):
+            xb.append(random.randrange(0,99))
+            yb.append(random.randrange(0,59))
+            xb[(len(xb) - 1)] = xb[(len(xb) - 1)] * 20
+            yb[(len(yb) - 1)] = yb[(len(yb) - 1)] * 20
+            current = len(xb)
+    def draw(canvas):
+        num = 0
+        for currentb in range (0,len(xb)):
+            xx = xb[num] + 19
+            yy = yb[num] + 19
+            canvas.draw_polygon([[xb[num],yb[num]],[xx,yb[num]],[xx,yy],[xb[num],yy]],1,"Black","RGB(81, 85, 91)")
+            currentb += 1
+            num += 1
+class Train:
+    def draw(canvas):
+        global xt,yt
+        xx = xt + 119
+        yy = yt + 59
+        x2 = xx + 40
+        y2 = yt
+        xx2 = x2 + 119
+        yy2 = y2 + 59
+        x3 = xx2 + 40
+        y3 = yt
+        xx3 = x3 + 119
+        yy3 = y3 + 59
+        x4 = xx3 + 40
+        y4 = yt
+        xx4 = x4 + 119
+        yy4 = y4 + 59
+        x5 = xx4 + 40
+        y5 = yt
+        xx5 = x5 + 119
+        yy5 = y5 + 59
+        x6 = xx5 + 40
+        y6 = yt
+        xx6 = x6 + 119
+        yy6 = y6 + 59
+        canvas.draw_polygon([[xt,yt],[xx,yt],[xx,yy],[xt,yy]],1,"Black","RGB(153, 70, 70)")
+        canvas.draw_polygon([[x2,y2],[xx2,y2],[xx2,yy2],[x2,yy2]],1,"Black","rgb(99, 51, 51)")
+        canvas.draw_polygon([[x3,y3],[xx3,y3],[xx3,yy3],[x3,yy3]],1,"Black","rgb(99, 51, 51)")
+        canvas.draw_polygon([[x4,y4],[xx4,y4],[xx4,yy4],[x4,yy4]],1,"Black","rgb(99, 51, 51)")
+        canvas.draw_polygon([[x5,y5],[xx5,y5],[xx5,yy5],[x5,yy5]],1,"Black","rgb(99, 51, 51)")
+        canvas.draw_polygon([[x6,y6],[xx6,y6],[xx6,yy6],[x6,yy6]],1,"Black","rgb(99, 51, 51)")
+        if xt == -900:
+            xt = 3000
+def draw(canvas):
+    global current,apple,x,y,time,num,can_turn,can_turnp2,speed,xt,yt,collected_by
+    if wierd:
+        canvas.draw_polygon([[300,0],[300,400],[700,400],[700,0]],1,"Red","Black")
+    if tunnel:
+        canvas.draw_polygon([[300,0],[300,280],[700,280],[700,0]],1,"Black","RGB(0,125,255)")
+        canvas.draw_polygon([[300,320],[300,600],[700,600],[700,320]],1,"Black","RGB(0,125,255)")
+    if portal:
+        canvas.draw_polygon([[300,0],[300,600],[700,600],[700,0]],1,"Black","RGB(0,125,255)")
+        ##portal 1
+        canvas.draw_polygon([[300,0],[300,20],[320,20],[320,0]],1,"Black","RGB(255,165,0)")
+        canvas.draw_polygon([[680,0],[680,20],[700,20],[700,0]],1,"Black","RGB(255,165,0)")
+        ##portal 2
+        canvas.draw_polygon([[300,580],[300,600],[320,600],[320,580]],1,"Black","RGB(255,140,0)")
+        canvas.draw_polygon([[680,580],[700,580],[700,600],[680,600]],1,"Black","RGB(255,140,0)")
+        canvas.draw_polygon([[300,280],[300,320],[320,320],[320,280]],1,"Black","RGB(255,140,0)")
+        canvas.draw_polygon([[680,280],[700,280],[700,320],[680,320]],1,"Black","RGB(255,140,0)")
+    if train:
+        canvas.draw_polygon([[0,280],[0,300],[1000,300],[1000,280]],1,"Black","RGB(114, 105, 105)")
+        canvas.draw_polygon([[0,320],[0,340],[1000,340],[1000,320]],1,"Black","RGB(114, 105, 105)")
+    for spawned in range (0,1):
+        xxa = xa + 19
+        yya = ya + 19
+        canvas.draw_polygon([[xa,ya],[xxa,ya],[xxa,yya],[xa,yya]],1,"Red","Red")
+    if apple < 1:
+        gen_apple()
+        apple += 1
+    if x[0] == xa and y[0] == ya:
+        collect()
+    if multi:
+        if xp2[0] == xa and yp2[0] == ya:
+            collected_by = 2
+            collect()
+    if not multi:
+        if pause == False:
+            if (time % speed) == 0 and not dead:
+                segment.move()
+                test_dead()
+                can_turn = True
+                if portal:
+                    test_tp()
+            if not dead:
+                time += 1
+                if train:
+                    if (time % 7) == 0:
+                        xt -= 20
+    if multi:
+        if pause == False:
+            if(time % speed) == 0 and ((dead and not deadp2) or (not dead and deadp2) or (not dead and not deadp2)):
+                if not dead:
+                    segment.move()
+                if not deadp2:
+                    segment.movep2()
+                test_dead()
+                can_turn = True
+                can_turnp2 = True
+            if ((dead and not deadp2) or (not dead and deadp2) or (not dead and not deadp2)):
+                time += 1
+    if time == 1 and blocky:
+        blocks.gen_barriers()
+    if blocky:
+        blocks.draw(canvas)
+    if train:
+        if xt > 1000:
+            train_distance = (xt - 1000) / 20    
+            canvas.draw_text("Time until Train: " + str(train_distance),[20,100],30,"Yellow")
+        Train.draw(canvas)
+    segment.draw(canvas)
+    if multi:
+        segment.drawp2(canvas)
+        canvas.draw_text("Score: " + str(lengthp2),[200,40],30,"Red")
+    canvas.draw_text("Score: " + str(length),[50,40],30,"Red")
+    canvas.draw_text("High Score: " + str(high_score),[20,70],30,"Red")
+frame = simplegui.create_frame("Snake",sizex,sizey)
+frame.set_canvas_background("Teal")
+frame.set_keydown_handler(keydown)
+frame.set_draw_handler(draw)
+frame.start()
