@@ -1,0 +1,492 @@
+#Bomber game
+#Made By Aaron Surburg
+#      !!IMPORTANT!!
+#If it isn't in full screen, it will crash when loading
+# a new level after you win
+#      !!IMPORTANT!!
+import simplegui
+import random
+
+gravity = .06
+#last 3 digits are recharge speed for the anti-aircraft 
+#guns, feel free to change them
+#first is green,second is Yellow, third is Red
+#                     | | |
+recharge_speed = [0.5,2,1,0]
+# how fast the anit-aircraft bullets fly
+bullet_speed = 12
+# how fast the bombs fall
+bullet_shoot_speed,bullet_shoot_speed2 = 2,2
+
+#DO NOT MESS WITH!!!
+bulletx,bullety = 50,50
+bulletx2,bullety2 = 50,50
+Crashed = False
+onground = False
+ballcreate = False
+ship_width = 10
+ship_height = 15
+ship_accel = [0.05,0.1]
+block_width = 50
+difficulty = 0
+blockmax = 5
+
+color,ship_color = "White","White"
+#Just to be declared, 0 isn't used
+x1,x2,x3,y1,y2,y3 = 0,0,0,0,0,0
+message = " "
+message2 = " "
+bulletnumcount,ballsize = 0,0
+recharge,bulletnum,sthrusting,velside,bullet_shoot_speed,bullet_shoot_speed2 = 0,0,0,0,0,0
+#End declarations
+def new_game():
+    global ship_locx,ship_locy, vel, thrusting,in_flight,onground,message
+    global lgear,color,ship_color,ballsize,ballcreate,Crashed,block_destroyed
+    global blocknum,b1x,b1xx,b1y,b1yy,b2x,b2xx,b2y,b2yy,b3x,b3xx,b3y,b3yy,b4x,b4xx,b4y,b4yy,b5x,b5xx,b5y,b5yy
+    global bullet1hit,bullet2hit,recharge,blasternum,blaster_recharge,pause
+    global blaster1,blaster2,blastercolor,blaster_destroyed,bshot,barrel1,barrel2
+    pause = False
+    blastercolor = ["Green","Green"]
+    blaster1,blaster2 = [0,0,0,0],[0,0,0,0]
+    barrel1,barrel2 = [0,0,0,0],[0,0,0,0]
+    blaster_recharge = [0,0]
+    b1x,b1xx,b1y,b1yy,b2x,b2xx,b2y,b2yy,b3x,b3xx,b3y,b3yy,b4x,b4xx,b4y,b4yy,b5x,b5xx,b5y,b5yy = 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    vel,velside,sthrusting,recharge,bulletnum = 0,0,0,0,3
+    bulletx,bullety = 50,50
+    bulletx2,bullety2 = 50,50
+    bshot = [0,0,0,0]
+    bulletnumcount,recharge = 0,0
+    ship_color = "White"
+    color = "White"
+    in_flight, thrusting = False,False
+    ship_locx = 150
+    ship_locy = 400
+    onground = False
+    message = " "
+    lgear = True
+    ballcreate = False
+    blocknum = 0
+    blasternum = 0
+    block_destroyed = 0
+    bullet1hit,bullet2hit = False,False
+    blaster_destroyed = 0
+    blocks()  
+    blasters()
+    Crashed = False
+def keydown(in0):
+    global thrusting,lgear,sthrusting,pause
+    in0 -= 37
+    if in0 == 0:
+        sthrusting = 1
+    if in0 == 2:
+        sthrusting = 2
+    if in0 == 1:
+        thrusting = True
+    if in0 == 34 and lgear == True:
+        lgear = False
+    elif in0 == 34 and lgear == False:
+        lgear = True
+    if in0 == 43 and pause != True:
+        pause = True
+    elif in0 == 43 and pause == True:
+        pause = False
+#Gun
+    if in0 == -5 and onground != True and in_flight == True:
+        shoot()
+    if in0 == 45:
+        new_game()
+def keyup(in0):
+    global vel,thrusting,sthrusting
+    in0 -= 37
+    if in0 == 1:
+        thrusting = False
+    if in0 == 0:
+        sthrusting = 0
+    if in0 == 2:
+        sthrusting = 0 
+def loc():
+    global x1,x2,x3,y1,y2,y3,ship_width,ship_height
+    global ship_locx,ship_locy
+    x1 = ship_locx
+    y1 = ship_locy - (ship_height * 2)
+    x2 = x1 + (ship_width / 2)
+    y2 = y1 + ship_height
+    x3 = x2 - ship_width
+    y3 = y1 + ship_height
+def blocks():
+    global blocknum
+    while blocknum <= blockmax:
+        genblock()
+        blocknum += 1
+def genblock():
+    global b1x,b1xx,b1y,b1yy,b2x,b2xx,b2y,b2yy,b3x,b3xx,b3y,b3yy,b4x,b4xx,b4y,b4yy,b5x,b5xx,b5y,b5yy
+    difficulty = random.randrange(5,15)
+    blockx = [blocknum * 50 + 200, blocknum * 50 + 200 +block_width]
+    blocky = [390,390 - (difficulty * 16)]
+    if blocknum == 1:
+            b1x,b1xx,b1y,b1yy = blockx[0],blockx[1],blocky[0],blocky[1]
+    elif blocknum == 2:
+            b2x,b2xx,b2y,b2yy = blockx[0],blockx[1],blocky[0],blocky[1]
+    elif blocknum == 3:
+            b3x,b3xx,b3y,b3yy = blockx[0],blockx[1],blocky[0],blocky[1]
+    elif blocknum == 4:
+            b4x,b4xx,b4y,b4yy = blockx[0],blockx[1],blocky[0],blocky[1]
+    elif blocknum == 5:
+            b5x,b5xx,b5y,b5yy = blockx[0],blockx[1],blocky[0],blocky[1]
+def blasters():
+    global blasternum,blastercolor
+    level_difficulty = random.randrange(0,3)
+    if level_difficulty == 0:
+        blastercolor = ["Red","Red"]
+    if level_difficulty == 1:
+        blastercolor[1] = "Red"
+    while blasternum <= level_difficulty:
+        genblasters()
+        blasternum += 1
+def blaster_model():
+    global blasterx,blasterbarrelx
+    global blastery,blasterbarrely
+    blasterx = [numset[0],(numset[0] + 40)]
+    blastery = [numset[1],(numset[1] - 40)]
+    blasterbarrelx = [(blasterx[0] + 15),(blasterx[1] - 15)]
+    blasterbarrely = [blastery[1],(blastery[1] - 25)]
+def genblasters():
+    global numset,blaster1,blaster2,barrel1,barrel2
+    if blasternum == 1:
+        numset = [200,390]
+        blaster_model()
+        blaster1 = [blasterx[0],blasterx[1],blastery[0],blastery[1]]
+        barrel1 = [blasterbarrelx[0],blasterbarrelx[1],blasterbarrely[0],blasterbarrely[1]]
+    if blasternum == 2:
+        numset = [510,390]
+        blaster_model()
+        blaster2 = [blasterx[0],blasterx[1],blastery[0],blastery[1]]
+        barrel2 = [blasterbarrelx[0],blasterbarrelx[1],blasterbarrely[0],blasterbarrely[1]]
+def isblockhit():
+    if (ship_locx > b1x and ship_locx < b1xx) and ship_locy > b1yy:
+        crashed()
+    if (ship_locx > b2x and ship_locx < b2xx) and ship_locy > b2yy:
+        crashed()
+    if (ship_locx > b3x and ship_locx < b3xx) and ship_locy > b3yy:
+        crashed()
+    if (ship_locx > b4x and ship_locx < b4xx) and ship_locy > b4yy:
+        crashed()
+    if (ship_locx > b5x and ship_locx < b5xx) and ship_locy > b5yy:
+        crashed()
+def isblockhitbullet():
+    global block_destroyed,bullet1hit,bullet2hit
+    if b1yy < 375:
+        if (bulletx > b1x and bulletx < b1xx) and bullety > b1yy:
+            block_destroyed = 1
+            destroy()
+            bullet1hit = True
+            destroy_bullet()
+    if b2yy < 375:
+        if (bulletx > b2x and bulletx < b2xx) and bullety > b2yy:
+            block_destroyed = 2
+            destroy()
+            bullet1hit = True
+            destroy_bullet()
+    if b3yy < 375:
+        if (bulletx > b3x and bulletx < b3xx) and bullety > b3yy:
+            block_destroyed = 3
+            destroy()
+            bullet1hit = True
+            destroy_bullet()
+    if b4yy < 375:
+        if (bulletx > b4x and bulletx < b4xx) and bullety > b4yy:
+            block_destroyed = 4
+            destroy()
+            bullet1hit = True
+            destroy_bullet()
+    if b5yy < 375:
+        if (bulletx > b5x and bulletx < b5xx) and bullety > b5yy:
+            block_destroyed = 5
+            destroy()
+            bullet1hit = True
+            destroy_bullet()
+    if b1yy < 375:
+        if (bulletx2 > b1x and bulletx2 < b1xx) and bullety2 > b1yy:
+            block_destroyed = 1
+            destroy()
+            bullet2hit = True
+            destroy_bullet()
+    if b2yy < 375:
+        if (bulletx2 > b2x and bulletx2 < b2xx) and bullety2 > b2yy:
+            block_destroyed = 2
+            destroy()
+            bullet2hit = True
+            destroy_bullet()
+    if b3yy < 375:
+        if (bulletx2 > b3x and bulletx2 < b3xx) and bullety2 > b3yy:
+            block_destroyed = 3
+            destroy()
+            bullet2hit = True
+            destroy_bullet()
+    if b4yy < 375:
+        if (bulletx2 > b4x and bulletx2 < b4xx) and bullety2 > b4yy:
+            block_destroyed = 4
+            destroy()
+            bullet2hit = True
+            destroy_bullet()
+    if b5yy < 375:
+        if (bulletx2 > b5x and bulletx2 < b5xx) and bullety2 > b5yy:
+            block_destroyed = 5
+            destroy()
+            bullet2hit = True
+            destroy_bullet()
+def isblasterhit():
+    if (ship_locx > blaster1[0] and ship_locx < blaster1[1]) and ((ship_locy - 10) < blaster1[2] and (ship_locy - 7) > blaster1[3]):
+        crashed()
+    if (ship_locx > blaster2[0] and ship_locx < blaster2[1]) and ((ship_locy - 10) < blaster2[2] and (ship_locy - 7) > blaster2[3]):
+        crashed()
+def isblasterhitbullet():
+    global blaster_destroyed,bullet1hit,bullet2hit
+    if (bulletx > blaster1[0] and bulletx < blaster1[1]) and bullety > blaster1[3]:
+        blaster_destroyed = 1
+        destroy_blaster()
+        bullet1hit = True
+        destroy_bullet()
+    if (bulletx2 > blaster1[0] and bulletx2 < blaster1[1]) and bullety2 > blaster1[3]:
+        blaster_destroyed = 1
+        destroy_blaster()
+        bullet2hit = True
+        destroy_bullet()
+    if (bulletx > blaster2[0] and bulletx < blaster2[1]) and bullety > blaster2[3]:
+        blaster_destroyed = 2
+        destroy_blaster()
+        bullet1hit = True
+        destroy_bullet()
+    if (bulletx2 > blaster2[0] and bulletx2 < blaster2[1]) and bullety2 > blaster2[3]:
+        blaster_destroyed = 2
+        destroy_blaster()
+        bullet2hit = True
+        destroy_bullet()
+def is_ship_hit():
+    if (bshot[0] < (x2 + 5) and bshot[0] > (x3 - 5)) and (bshot[1] <= y2 and bshot[1] >= y1):
+        crashed()
+    if (bshot[2] < (x2 + 5) and bshot[2] > (x3 - 5)) and (bshot[3] <= y2 and bshot[3] >= y1):
+        crashed()
+def destroy():
+    global b1yy,b2yy,b3yy,b4yy,b5yy,block_destroyed
+    if block_destroyed == 1:
+        b1yy += 25
+        block_destroyed = 0
+    if block_destroyed == 2:
+        b2yy += 25
+        block_destroyed = 0
+    if block_destroyed == 3:
+        b3yy += 25
+        block_destroyed = 0
+    if block_destroyed == 4:
+        b4yy += 25
+        block_destroyed = 0
+    if block_destroyed == 5:
+        b5yy += 25
+        block_destroyed = 0
+def destroy_blaster():
+    global blaster_destroyed,blastercolor
+    canfire1 = True
+    canfire2 = True
+    if blaster_destroyed == 1:
+        blaster_destroyed = 0
+        canfire1 = False
+        if blastercolor[0] == "Green":
+            blastercolor[0] = "Yellow"
+        elif blastercolor[0] == "Yellow":
+            blastercolor[0] = "Red"
+    if blaster_destroyed == 2:
+        blaster_destroyed = 0
+        canfire2 = False
+        if blastercolor[1] == "Green":
+            blastercolor[1] = "Yellow"
+        elif blastercolor[1] == "Yellow":
+            blastercolor[1] = "Red"
+def destroy_bullet():
+    global bulletx,bulletx2,bullet1hit,bullet2hit
+    if bullet1hit == True:
+        bulletx = -5
+        bullet1hit = False
+    if bullet2hit == True:
+        bulletx2 = -5
+        bullet2hit = False
+def crashed():
+    global in_flight,onground,vel,velside,ship_color,message
+    in_flight = False
+    onground = True
+    vel,velside = 0,0
+    message = "BOOM!!"
+    ship_color = "Red"
+    crashanimation()
+def crashanimation():
+    global ballcreate
+    ballcreate = True
+def shoot():
+    global bulletnum,bullet_shoot_speed,bullet_shoot_speed2
+    if recharge >= 50:
+        if bulletnum == 2:
+            bulletnum = 1
+            bullet_shoot_speed2 = abs(vel)
+        if bulletnum == 3:
+            bulletnum = 0
+            bullet_shoot_speed = abs(vel)
+        createbullet()        
+def will_blaster_fire():
+    global blastershoot
+    if (ship_locx < (blaster1[0] + 100) and ship_locx > (blaster1[1] - 40)) and ship_locy < blaster1[3]:
+        blastershoot = 1
+        fire()
+    if (ship_locx > (blaster1[0] - 100) and ship_locx < (blaster1[1] + 40)) and ship_locy < blaster1[3]:
+        blastershoot = 1
+        fire()
+    if (ship_locx < (blaster2[0] + 100) and ship_locx > (blaster2[1] - 40)) and ship_locy < blaster2[3]:
+        blastershoot = 2
+        fire()
+    if (ship_locx > (blaster2[0] - 100) and ship_locx < (blaster2[1] + 40)) and ship_locy < blaster2[3]:
+        blastershoot = 2
+        fire()
+def fire():
+    global blastershoot,blaster_recharge
+    if blastershoot == 1 and blaster_recharge[0] == 100:
+        blaster_recharge[0] = 0
+        create_blaster_shot()
+        blastershoot = 0
+    if blastershoot == 2 and blaster_recharge[1] == 100:
+        blaster_recharge[1] = 0
+        create_blaster_shot()
+        blastershoot = 0
+def createbullet():
+    global bulletx,bullety,bulletx2,bullety2,recharge,bulletnum,bulletnumcount
+    global color
+    if bulletnum == 1:
+        bulletnumcount += 1
+        recharge -= 50
+        bulletx2 = ship_locx
+        bullety2 = ship_locy + 16
+        bulletnum = 3
+        color = "White"
+    if bulletnum == 0:
+        bulletnumcount += 1
+        recharge -= 50
+        bulletx = ship_locx
+        bullety = ship_locy + 16
+        bulletnum = 2
+        color = "White"
+def create_blaster_shot():
+    global bshot
+    if blastershoot == 1:
+        bshot[0] = ((barrel1[0] + barrel1[1]) / 2)
+        bshot[1] = barrel1[3]
+    if blastershoot == 2:
+        bshot[2] = ((barrel2[0] + barrel2[1]) / 2)
+        bshot[3] = barrel2[3]
+def draw(canvas):
+    global vel,ship_locy,ship_locx,in_flight,message,onground,message2
+    global Crashed,velside,sthrusting,velside,recharge,blaster_recharge
+    global bullety,bullety2,ship_color,ballsize,bshot
+#Ground
+    canvas.draw_line([0,400],[700,400],20,"Green")
+#blocks
+    canvas.draw_polygon([[b1x,b1y],[b1xx,b1y],[b1xx,b1yy],[b1x,b1yy]],2,"Gray","White")
+    canvas.draw_polygon([[b2x,b2y],[b2xx,b2y],[b2xx,b2yy],[b2x,b2yy]],2,"Gray","White")
+    canvas.draw_polygon([[b3x,b3y],[b3xx,b3y],[b3xx,b3yy],[b3x,b3yy]],2,"Gray","White")
+    canvas.draw_polygon([[b4x,b4y],[b4xx,b4y],[b4xx,b4yy],[b4x,b4yy]],2,"Gray","White")
+    canvas.draw_polygon([[b5x,b5y],[b5xx,b5y],[b5xx,b5yy],[b5x,b5yy]],2,"Gray","White")
+#blasters
+    canvas.draw_polygon([[blaster1[0],blaster1[2]],[blaster1[1],blaster1[2]],[blaster1[1],blaster1[3]],[blaster1[0],blaster1[3]]],2,"Gray",blastercolor[0])
+    canvas.draw_polygon([[blaster2[0],blaster2[2]],[blaster2[1],blaster2[2]],[blaster2[1],blaster2[3]],[blaster2[0],blaster2[3]]],2,"Gray",blastercolor[1])
+    canvas.draw_polygon([[barrel1[0],barrel1[2]],[barrel1[1],barrel1[2]],[barrel1[1],barrel1[3]],[barrel1[0],barrel1[3]]],2,"Gray","Gray")
+    canvas.draw_polygon([[barrel2[0],barrel2[2]],[barrel2[1],barrel2[2]],[barrel2[1],barrel2[3]],[barrel2[0],barrel2[3]]],2,"Gray","Gray")
+#blaster bullets
+    canvas.draw_line([bshot[0],bshot[1]],[bshot[0],(bshot[1] - 15)],5,color)
+    canvas.draw_line([bshot[2],bshot[3]],[bshot[2],(bshot[3] - 15)],5,color)
+
+#bullet
+    canvas.draw_line([bulletx,(bullety - 15)],[bulletx,(bullety - 30)],5,color)
+    canvas.draw_line([bulletx2,(bullety2 - 15)],[bulletx2,(bullety2 - 30)],5,color)
+    canvas.draw_text("recharge:" + str(recharge) + "%",[150,20],20,"Yellow")
+#Crash Explosion
+    
+    canvas.draw_circle([ship_locx,ship_locy], (ballsize * ballsize + 0.01), (ballsize * ballsize + 0.01),"Orange")
+#Ship    
+    canvas.draw_polygon([[x1,y1],[x2,y2],[x3,y3]],10,ship_color)
+    canvas.draw_text("Ship Velocity: " + str(vel),[300,20],20,"Green")
+    canvas.draw_text(message,[100,250],100,"Red")
+    canvas.draw_text(message2,[470,20],20,"Blue")
+    if pause != True:
+        if lgear == True:
+            message2 = "Landing gear is on"
+        if lgear == False:
+            message2 = "Landing gear is off"
+        if thrusting == True and onground != True:
+            if lgear == True:
+                vel += ship_accel[1]
+            if lgear == False:
+                vel += (ship_accel[1] * 2)
+        if sthrusting == 1 and onground != True:
+            velside -= ship_accel[0]
+        if sthrusting == 2 and onground != True:
+            velside += ship_accel[0]
+        if ship_locy <= 399:
+            in_flight = True
+        elif ship_locy >= 401:
+            if lgear == False or vel < -1.5 or velside > 4 or velside < -4:
+                crashed()
+                Crashed = True
+            elif lgear == True and vel > -1.5 and Crashed == False:
+                in_flight = False
+                onground = True
+                vel,velside = 0,0
+                if (b1yy >= 375) and (b2yy >= 375) and (b3yy >= 375) and (b4yy >= 375) and (b5yy >= 375) and (blastercolor[0] == "Red") and (blastercolor[1] == "Red"):
+                    message = "You Win!"
+        if ship_locx < 0:
+            ship_locx = 700
+        if ship_locx > 700:
+            ship_locx = 0
+        if in_flight == True:
+            vel -= gravity
+
+        if recharge < 100:
+            recharge += recharge_speed[0]
+        if blaster_recharge[0] < 100:
+            if blastercolor[0] == "Green":
+                blaster_recharge[0] += recharge_speed[1]
+            elif blastercolor[0] == "Yellow":
+                blaster_recharge[0] += recharge_speed[2]
+            elif blastercolor[0] == "Red":
+                blaster_recharge[0] += recharge_speed[3]
+        if blaster_recharge[1] < 100:
+            if blastercolor[1] == "Green":
+                blaster_recharge[1] += recharge_speed[1]
+            elif blastercolor[1] == "Yellow":
+                blaster_recharge[1] += recharge_speed[2]
+            elif blastercolor[1] == "Red":
+                blaster_recharge[1] += recharge_speed[3]
+
+        if ballsize < 10 and ballcreate == True:
+            ballsize += 0.5
+        if ballcreate == False:
+            ballsize = 0
+
+        bshot[1] -= bullet_speed
+        bshot[3] -= bullet_speed
+        bullety2 += 6
+        bullety += 6
+        ship_locx += velside
+        ship_locy -= vel    
+        will_blaster_fire()
+        loc()
+        isblockhit()
+        isblockhitbullet()
+        isblasterhit()
+        isblasterhitbullet()
+        is_ship_hit()
+frame = simplegui.create_frame("New Game", 700,500)
+frame.add_button("Reset",new_game)
+
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+frame.set_draw_handler(draw)
+
+new_game()
+frame.start()
