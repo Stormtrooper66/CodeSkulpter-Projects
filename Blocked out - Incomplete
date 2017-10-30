@@ -1,0 +1,225 @@
+##My version of blocked out
+##Created by Aaron Surburg
+import simplegui
+
+gravity = 0.5
+movable = False
+title = True
+menu = False
+##just to be declared, doesn't do anything if changed
+stoprr,stoprl,stopbr,stopbl = True,True,True,True
+red = [0,0,0,0]
+rhead = [0,0,0,0]
+redpos = [0,0]
+blue = [0,0,0,0]
+bhead = [0,0,0,0]
+bluepos = [0,0]
+redpos = [225,223]
+bluepos = [525,223]
+rvel,bvel = 0,0
+rground,bground,rcanjump,bcanjump = True,True,True,True
+## end nearly pointless declarations
+def keydown(in0):
+    global stoprr,stoprl,stopbr,stopbl,rcanjump,bancjump
+    in0 -= 37
+    if in0 == 0:
+        stoprl = False
+    if in0 == 1 and rcanjump == True:
+        redjump()
+    if in0 == 2:
+        stoprr = False
+    if in0 == 28:
+        stopbl = False
+    if in0 == 50 and bcanjump == True:
+        bluejump()
+    if in0 == 31:
+        stopbr = False
+    if in0 == 45:
+        retry()
+def keyup(in0):
+    global stoprr,stoprl,stopbr,stopbl
+    in0 -= 37
+    stop = True
+    if in0 == 0:
+        stoprl = True
+    if in0 == 2:
+        stoprr = True
+    if in0 == 28:
+        stopbl = True
+    if in0 == 31:
+        stopbr = True
+def mouse_handler(pos):
+     if title:
+        if 300 <= pos[0] <= 450 and 200 <= pos[1] <= 250:
+            menu = True
+
+##basic functions
+def retry():
+    print("not yet implimented")
+##Red
+def redright():
+    global redpos
+    red_hitting_wall()
+    if not stoprr:
+        redpos[0] += 3
+def redjump():
+    global rvel,rground,rcanjump
+    rvel = 10
+    rground = False
+    rcanjump = False
+def redleft():
+    global redpos
+    red_hitting_wall()
+    if not stoprl:
+        redpos[0] -= 3
+def redloc():
+    global redpos
+    redmodel()
+def redmodel():
+    global red
+    red[0] = redpos[0]
+    red[1] = red[0] + 10
+    red[2] = redpos[1]
+    red[3] = red[2] + 20
+    rhead[0] = (red[1] - 8)
+    rhead[1] = rhead[0] + 5
+    rhead[2] = red[2]
+    rhead[3] = rhead[2] - 10
+def red_on_ground():
+    global rground,rvel,rcanjump
+    if redpos[1] >= 370:
+        rground = True
+        rcanjump = True
+        rvel = 0
+    elif redpos[1] <= 370:
+        rground = False    
+def red_hitting_wall():
+    global stoprr,stoprl
+    bheight = [346,296,246,196,146]
+    if ((red[1] + 6) >= 250 and red[1] <= 300) and red[2] >= bheight[0]:
+        stoprr = True
+    elif ((red[1] + 6) >= 300 and red[1] <= 350) and red[2] >= bheight[1]:
+        stoprr = True
+    elif ((red[1] + 6) >= 350 and red[1] <= 400) and red[2] >= bheight[2]:
+        stoprr = True
+    elif ((red[1] + 6) >= 400 and red[1] <= 450) and red[2] >= bheight[3]:
+        stoprr = True
+    elif ((red[1] + 6) >= 450 and red[1] <= 500) and red[2] >= bheight[4]:
+        stoprr = True
+    elif ((red[0] - 6) <= 500 and red[0] >= 450) and red[2] >= bheight[4]:
+        stoprl = True
+def red_on_block():
+    global rcanjump,rvel,redpos
+    bheight = [346,296,246,196,146]
+    if ((red[1] + 6) >= 253 and red[1] <= 300) and red[2] >= (bheight[0] - 25):
+        rvel = 0
+        redpos[1] = bheight[0] - 26
+        rcanjump = True
+    elif ((red[1] + 6) >= 303 and red[1] <= 350) and red[2] >= (bheight[1] - 25):
+        rvel = 0
+        redpos[1] = bheight[1] - 26
+        rcanjump = True
+    elif ((red[1] + 6) >= 353 and red[1] <= 400) and red[2] >= (bheight[2] - 25):
+        rvel = 0
+        redpos[1] = bheight[2] - 26
+        rcanjump = True
+    elif ((red[1] + 6) >= 403 and red[1] <= 450) and red[2] >= (bheight[3] - 25):
+        rvel = 0
+        redpos[1] = bheight[3] - 26
+        rcanjump = True
+    elif ((red[1] + 6) >= 453 and red[1] <= 500) and red[2] >= (bheight[4] - 25):
+        rvel = 0
+        redpos[1] = bheight[4] - 26
+        rcanjump = True
+##Blue
+def blueright():
+    global bluepos
+    if not stopbr:
+        bluepos[0] += 3
+def bluejump():
+    global bvel
+    bvel = 10
+def blueleft():
+    global bluepos
+    if not stopbl:
+        bluepos[0] -= 3
+def blueloc():
+    global bluepos
+    bluemodel()
+def bluemodel():
+    global blue
+    blue[0] = bluepos[0]
+    blue[1] = blue[0] + 10
+    blue[2] = bluepos[1]
+    blue[3] = blue[2] + 20
+    bhead[0] = (blue[1] - 7)
+    bhead[1] = bhead[0] + 4
+    bhead[2] = blue[2]
+    bhead[3] = bhead[2] - 10
+def blue_on_ground():
+    global bground,bvel
+    if bluepos[1] >= 375:
+        bground = True
+        bvel = 0
+    elif bluepos[1] < 375:
+        bground = False
+def draw(canvas):
+    global rvel,redpos,bvel,bluepos,wall
+##Title Screen
+    if title:
+        canvas.draw_polygon([[0,0],[0,200],[800,200],[800,0]],5,"Black","Black")
+        canvas.draw_polygon([[250,200],[250,250],[510,250],[510,200]],5,"Black","Black")
+        canvas.draw_polygon([[200,250],[225,275],[530,275],[555,250]],5,"Black","Black")
+        canvas.draw_text("START",[300,240],50,"White")
+        canvas.draw_text("Blocked Out",[240,100],50,"Blue","sans-serif")
+##Selection Screen
+#   if menu:
+#      bar = 0
+#     for bar in range(0,5):
+            
+##ground
+    canvas.draw_polygon([[0,400],[0,500],[800,500],[800,400]],5,"Black","Black")
+##Walls
+    if movable:
+        x = 250
+        times = 0
+
+        for times in range (0,5):
+            times += 1
+            xx = x + 50
+            y = 396
+            yy = y - (50 * times)
+            canvas.draw_polygon([[x,y],[xx,y],[xx,yy],[x,yy]],1,"White","White")
+            x += 50
+##players
+    #Red
+    canvas.draw_polygon([[red[0],red[2]],[red[0],red[3]],[red[1],red[3]],[red[1],red[2]]],10,"Red","Red")
+    canvas.draw_polygon([[rhead[0],rhead[2]],[rhead[0],rhead[3]],[rhead[1],rhead[3]],[rhead[1],rhead[2]]],5,"Red","Red")
+    #Blue
+    canvas.draw_polygon([[blue[0],blue[2]],[blue[0],blue[3]],[blue[1],blue[3]],[blue[1],blue[2]]],10,"Blue","Blue")
+    canvas.draw_polygon([[bhead[0],bhead[2]],[bhead[0],bhead[3]],[bhead[1],bhead[3]],[bhead[1],bhead[2]]],5,"Blue","Blue")
+    if movable:
+        if rvel > -10 and rground != True:
+            rvel -= gravity
+        if bvel > -10 and bground != True:
+            bvel -= gravity
+        redpos[1] -= rvel
+        bluepos[1] -= bvel
+
+        blue_on_ground()
+        red_on_ground()
+        redleft()
+        redright()
+        blueleft()
+        blueright()
+        if rground == False:
+            red_on_block()
+    blueloc()
+    redloc()
+frame = simplegui.create_frame("Blocked out",800,500)
+frame.set_canvas_background("teal")
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+frame.set_mouseclick_handler(mouse_handler)
+frame.start()
