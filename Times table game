@@ -1,0 +1,273 @@
+#Multiplication Game
+#Created by Aaron
+#Added skip bonus for every 10 correct
+#Added ability to type in answer and use Enter and Backspace
+import simplegui
+import random
+
+buttons = input("Number Buttons? y/n")
+if buttons == "y":
+    buttons = True
+    numfield = False
+else:
+    buttons = False
+    numfield = True
+
+intiger = random.randrange(0,10,2)
+in1 = random.randrange(0,10)
+in2 = random.randrange(0,10)
+in3 = in1 * in2
+ans1 = "_"
+ans2 = "_"
+anstotal = "__"
+button1 = True
+button2 = False
+times = 0
+correctnum = 0
+corstreak = 0
+skips = 4
+
+
+
+message = ("Welcome to the multiplication table game!")
+message2 = (" ")
+message3 = (" ")
+def key_handler(key):
+    global ans1,ans2,anstotal
+    key = key - 48
+    if key != -35 and key != -40:
+        if ans1 != "_":
+            ans2 = key
+        if ans1 == "_":
+            ans1 = key
+    if key == -35:
+        check()
+    if key == -40:
+        if ans1 != "_" and ans2 == "_":
+            ans1 = "_"
+        if ans1 != "_" and ans2 != "_":
+            ans2 = "_"
+    anstotal = str(ans1) + str(ans2)
+    
+def bonus():
+    global skips,message3
+    randomize()
+    num = correctnum / 10 - 1
+    skips += 4 + num
+    message3 = (" ")
+def exbonus():
+    global skips,message3
+    randomize()
+    num = corstreak / 5 - 2
+    skips += 8 + num
+    message3 = (" ")
+#to evade errors
+def anshandler():
+    global ans1,ans2,anstotal
+    if ans1 == ("_"):
+        ans1 = 0
+    if ans2 == ("_"):
+        ans2 = 0
+    anstotal = str(ans1)+str(ans2)
+#Checks if input answer is == to answer
+def check():
+    global ans1,ans2,anstotal,in1,in2,in3,message2,correctnum,corstreak,button1,button2
+    anshandler()
+    int(anstotal)
+    if int(anstotal) == in3:
+        correctnum += 1
+        corstreak += 1
+        button1 = True
+        button2 = False
+    if int(anstotal) != in3:
+        message2 = ("Incorrect")
+        corstreak = 0
+    if int(anstotal) == in3:
+        randomize()
+        message2 = ("Correct!")
+        if (correctnum % 10) == 0:
+            bonus()
+        if (corstreak % 10) == 0:
+            exbonus()
+#check for the input
+#Checks if input answer is == to answer
+def check2():
+    global ans1,ans2,anstotal,in1,in2,in3,message2,correctnum,corstreak,button1,button2
+    int(anstotal)
+    if int(anstotal) == in3:
+        correctnum += 1
+        corstreak += 1
+        button1 = True
+        button2 = False
+    if int(anstotal) != in3:
+        message2 = ("Incorrect")
+        corstreak = 0
+    if int(anstotal) == in3:
+        randomize()
+        message2 = ("Correct!")
+        if (correctnum % 10) == 0:
+            bonus()
+        if (corstreak % 10) == 0:
+            exbonus()
+        
+#Handler for new problems   
+def randomize():
+    global in1,in2,in3,ans1,ans2,anstotal,message2
+    in1 = random.randrange(0,10)
+    in2 = random.randrange(0,10)
+    in3 = in1 * in2
+    ans1 = "_"
+    ans2 = "_"
+    anstotal = "__"
+    message2 = " "
+
+#input handler
+def playerin(in0):
+    global ans1,ans2,anstotal
+    if len(in0) != 0:
+        if len(in0) == 1:
+            ans1 = 0
+            ans2 = in0
+            anstotal = str(ans1) + str(ans2)
+        if len(in0) == 2:
+            anstotal = str(in0)
+        check2()
+#Button Handler start
+#Skip button
+def click():
+    global in1,in2,in3,times,anstotal,message3,skips
+    if skips <= 0:
+        message3 = ("!!!Out of Skips!!!")
+    if skips >= 1:  
+        randomize()
+        skips -= 1 
+#digit buttons   
+def click1():
+    global button1,button2
+    print("set button1 to true")
+    button1 = True
+    button2 = False
+def click2():
+    global button1,button2
+    button1 = False
+    button2 = True
+#number buttons
+def cl0():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 0")
+    if button1 == True:
+        ans1 = 0
+    if button2 == True:
+        ans2 = 0
+    anstotal = str(ans1)+str(ans2)
+def cl1():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 1")
+    if button1 == True:
+        ans1 = 1
+        print("I did a thing")
+    if button2 == True:
+        ans2 = 1
+    anstotal = str(ans1)+str(ans2)
+def cl2():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 2")
+    if button1 == True:
+        ans1 = 2
+    if button2 == True:
+        ans2 = 2
+    anstotal = str(ans1)+str(ans2)
+def cl3():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 3")
+    if button1 == True:
+        ans1 = 3
+    if button2 == True:
+        ans2 = 3
+    anstotal = str(ans1)+str(ans2)
+def cl4():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 4")
+    if button1 == True:
+        ans1 = 4
+    if button2 == True:
+        ans2 = 4
+    anstotal = str(ans1)+str(ans2)
+def cl5():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 5")
+    if button1 == True:
+        ans1 = 5
+    if button2 == True:
+        ans2 = 5
+    anstotal = str(ans1)+str(ans2)
+def cl6():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 6")
+    if button1 == True:
+        ans1 = 6
+    if button2 == True:
+        ans2 = 6
+    anstotal = str(ans1)+str(ans2)
+def cl7():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 7")
+    if button1 == True:
+        ans1 = 7
+    if button2 == True:
+        ans2 = 7
+    anstotal = str(ans1)+str(ans2)
+def cl8():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 8")
+    if button1 == True:
+        ans1 = 8
+    if button2 == True:
+        ans2 = 8
+    anstotal = str(ans1)+str(ans2)
+def cl9():
+    global button1,button2,in1,in2,in3,ans1,ans2,anstotal
+    print("clicked 9")
+    if button1 == True:
+        ans1 = 9
+    if button2 == True:
+        ans2 = 9
+    anstotal = str(ans1)+str(ans2)
+
+# Handler to draw on canvas
+def draw(canvas):
+    canvas.draw_text(message, [50,50], 30, "Blue")
+    canvas.draw_text(str(intiger), [50,90], 30, "Red")
+    canvas.draw_text(str(in1)+" x "+str(in2)+" = "+ str(anstotal), [50,130],30,"Yellow")
+    canvas.draw_text("You have " + str(skips) + " Skips left",[50,170],30,"Green")
+    canvas.draw_text(message2,[50,210],30,"Red")
+    canvas.draw_text("You have had the correct answer " + str(correctnum) + " times",[50,240],30,"Blue")
+    canvas.draw_text("You have had the correct answer " + str(corstreak) + " times in a row",[50,280],30,"Blue")    
+    canvas.draw_text(message3,[50,320],30,"Yellow")
+    canvas.draw_text("To input Numbers, click First Digit for Tens place", [50, 450],20,"Green")  
+    canvas.draw_text("then click the number, for the Ones place click Second Digit",[50,470],20,"Green")
+    canvas.draw_text("then click the number",[50,490],20,"Green")
+# Create a frame and assign callbacks to event handlers
+frame = simplegui.create_frame("New Game", 700, 500)
+frame.set_keydown_handler(key_handler)
+if numfield == True:
+    frame.add_input("Answer",playerin, 20)
+frame.add_button("Skip", click)
+if buttons == True:
+    frame.add_button("First digit",click1)
+    frame.add_button("Second digit",click2)
+    frame.add_button("0",cl0)
+    frame.add_button("1",cl1)
+    frame.add_button("2",cl2)
+    frame.add_button("3",cl3)
+    frame.add_button("4",cl4)
+    frame.add_button("5",cl5)
+    frame.add_button("6",cl6)
+    frame.add_button("7",cl7)
+    frame.add_button("8",cl8)
+    frame.add_button("9",cl9)
+    frame.add_button("check",check)
+frame.set_draw_handler(draw)
+
+# Start the frame animation
+frame.start()
