@@ -1,0 +1,122 @@
+##Dice Game
+##Made by Aaron
+import simplegui
+import random
+
+width = 300
+height = -300
+corner = [50,350]
+
+#Just to be declared, doesn't effect anything if changed
+pos = [0,0,0,0]
+rad = [1,1,1,1,1,1]
+color = ["White","White","White","White","White","White"]
+cir1 = [200,200]
+cir2 = [200,200]
+cir3 = [200,200]
+cir4 = [200,200]
+cir5 = [200,200]
+cir6 = [200,200]
+# end nearly pointless declarations
+def circles():
+    global rad,color,cir1
+    if numrolled == 1:
+        d1()
+    if numrolled == 2:
+        d2()
+    if numrolled == 3:
+        d3()
+    if numrolled == 4:
+        d4()
+    if numrolled == 5:
+        d5()
+    if numrolled == 6:
+        d6()
+    clear()
+def d1():
+    global rad,cir1
+    rad[0] = 25
+    cir1 = [200,200]
+def d2():
+    global rad,cir1,cir2
+    rad[0] = 20
+    rad[1] = 20
+    cir1 = [270,130]
+    cir2 = [130,270]
+def d3():
+    global rad,cir1,cir2,cir3
+    rad[0] = 15
+    rad[1] = 15
+    rad[2] = 15
+    cir1 = [115,115]
+    cir2 = [200,200]
+    cir3 = [285,285]
+def d4():
+    global rad,cir1,cir2,cir3,cir4
+    rad[0] = 15
+    rad[1] = 15
+    rad[2] = 15
+    rad[3] = 15
+    cir1 = [125,125]
+    cir2 = [275,125]
+    cir3 = [275,275]
+    cir4 = [125,275]
+def d5():
+    global rad,cir1,cir2,cir3,cir4,cir5
+    rad[0] = 12
+    rad[1] = 12
+    rad[2] = 12
+    rad[3] = 12
+    rad[4] = 12
+    cir1 = [125,125]
+    cir2 = [275,125]
+    cir3 = [275,275]
+    cir4 = [125,275]
+    cir5 = [200,200]
+def d6():
+    global rad,cir1,cir2,cir3,cir4,cir5,cir6
+    rad = [12,12,12,12,12,12]
+    cir1 = [125,125]
+    cir2 = [125,200]
+    cir3 = [125,275]
+    cir4 = [275,125]
+    cir5 = [275,200]
+    cir6 = [275,275]
+def clear():
+    global color
+    if numrolled == 1:
+        color = ["Black","White","White","White","White","White"]
+    if numrolled == 2:
+        color = ["Black","Black","White","White","White","White"]
+    if numrolled == 3:
+        color = ["Black","Black","Black","White","White","White"]
+    if numrolled == 4:
+        color = ["Black","Black","Black","Black","White","White"]
+    if numrolled == 5:
+        color = ["Black","Black","Black","Black","Black","White"]
+    if numrolled == 6:
+        color = ["Black","Black","Black","Black","Black","Black"]
+def dice_backround():
+    global pos
+    pos[0] = corner[0]
+    pos[1] = corner[0] + width
+    pos[2] = corner[1]
+    pos[3] = corner[1] + height
+def roll():
+    global numrolled
+    numrolled = random.randint(1,6)
+    circles()
+def draw(canvas):
+    canvas.draw_polygon([[pos[0],pos[2]],[pos[1],pos[2]],[pos[1],pos[3]],[pos[0],pos[3]]],5,"Gray","White")
+    canvas.draw_circle([cir6[0],cir6[1]],rad[5],(rad[5] * 2),color[5])
+    canvas.draw_circle([cir5[0],cir5[1]],rad[4],(rad[4] * 2),color[4])
+    canvas.draw_circle([cir4[0],cir4[1]],rad[3],(rad[3] * 2),color[3])
+    canvas.draw_circle([cir3[0],cir3[1]],rad[2],(rad[2] * 2),color[2])
+    canvas.draw_circle([cir2[0],cir2[1]],rad[1],(rad[1] * 2),color[1])
+    canvas.draw_circle([cir1[0],cir1[1]],rad[0],(rad[0] * 2),color[0])
+    
+frame = simplegui.create_frame("Dice Game",400,400)
+frame.set_draw_handler(draw)
+frame.add_button("Roll Dice",roll)
+dice_backround()
+frame.start()
