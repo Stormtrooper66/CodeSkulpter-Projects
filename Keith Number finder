@@ -1,0 +1,160 @@
+# Kieth number finder
+# goes from 10 to 100000
+import simplegui
+keithnumbs = []
+digits = []
+#minimum is 10
+start_point = 10
+#maximum is 1000000 (one million)
+stop_point = 1000000
+current = start_point
+time = 0
+pause = False
+stop = False
+time_leftsecondstotal = ((stop_point - start_point) / 50)
+time_leftseconds = (time_leftsecondstotal % 60)
+time_leftmin = (time_leftsecondstotal - time_leftseconds) / 60
+def keys(in0):
+    global pause,stop
+    if in0 == 80 and pause == False:
+        pause = True
+    elif in0 == 80 and pause == True:
+        pause = False
+    if in0 == 83 and stop == False:
+        stop = True
+        print(keithnumbs)
+    elif in0 == 83 and stop == True:
+        stop = False
+def find():
+    global current,stop
+    if current == stop_point:
+        stop = True
+        print(keithnumbs)
+        print("Done!")
+    ans = 0
+    digitcurrent = 0
+    stringed_num = str(current)
+    digitnum = len(str(current))
+    digits = []
+    nextdig = 0
+    while len(digits) < digitnum:
+        digits.append(stringed_num[(digitcurrent)])
+        digitcurrent += 1
+    if len(digits) == 2:
+        a,b = digits[0],digits[1]
+        
+        a = int(a)
+        b = int(b)
+    if len(digits) == 3:
+        a,b,c = digits[0],digits[1],digits[2]
+        a = int(a)
+        b = int(b)
+        c = int(c)
+    if len(digits) == 4:
+        a,b,c,d = digits[0],digits[1],digits[2],digits[3]
+        a = int(a)
+        b = int(b)
+        c = int(c)
+        d = int(d)
+    if len(digits) == 5:
+        a,b,c,d,e = digits[0],digits[1],digits[2],digits[3],digits[4]
+        a = int(a)
+        b = int(b)
+        c = int(c)
+        d = int(d)
+        e = int(e)
+    if len(digits) == 6:
+        a,b,c,d,e,f = digits[0],digits[1],digits[2],digits[3],digits[4],digits[5]
+        a = int(a)
+        b = int(b)
+        c = int(c)
+        d = int(d)
+        e = int(e)
+        f = int(f)
+    if len(digits) == 2:
+        while ans < current:
+            ans = a + b
+            if (nextdig % 2) == 0:
+                a = ans
+            else:
+                b = ans
+            nextdig += 1
+    if len(digits) == 3:
+        while ans < current:
+            ans = a + b + c
+            if (nextdig % 3) == 0:
+                a = ans
+            elif (nextdig % 3) == 1:
+                b = ans
+            else:
+                c = ans
+            nextdig += 1
+    if len(digits) == 4:
+        while ans < current:
+            ans = a + b + c + d
+            if (nextdig % 4) == 0:
+                a = ans
+            elif (nextdig % 4) == 1:
+                b = ans
+            elif (nextdig % 4) == 2:
+                c = ans
+            else:
+                d = ans
+            nextdig += 1
+    if len(digits) == 5:
+        while ans < current:
+            ans = a + b + c + d + e
+            if (nextdig % 5) == 0:
+                a = ans
+            elif (nextdig % 5) == 1:
+                b = ans
+            elif (nextdig % 5) == 2:
+                c = ans
+            elif (nextdig % 5) == 3:
+                d = ans
+            else:
+                e = ans
+            nextdig += 1
+    if len(digits) == 6:
+        while ans < current:
+            ans = a + b + c + d + e + f
+            if (nextdig % 6) == 0:
+                a = ans
+            elif (nextdig % 6) == 1:
+                b = ans
+            elif (nextdig % 6) == 2:
+                c = ans
+            elif (nextdig % 6) == 3:
+                d = ans
+            elif (nextdig % 6) == 4:
+                e = ans
+            else:
+                f = ans
+            nextdig += 1
+    if ans == current:
+        keithnumbs.append(ans)
+    if not stop:
+        current += 1
+# Handler to draw on canvas
+def draw(canvas):
+    global time,stop,time_leftmin,time_leftseconds
+    canvas.draw_text(str(keithnumbs), [50,112], 10, "Yellow")
+    canvas.draw_text(str(current),[50,50],48,"Red")
+    canvas.draw_text("Time until finished: " + str(time_leftmin) + " Minutes and " + str(time_leftseconds) + " Seconds",[50,152],30,"Red")
+    if not pause and not stop:
+        if (time % 1) == 0:
+            find()
+        if (time % 50) == 0:
+            time_leftseconds -= 1
+            if time_leftseconds == -1:
+                time_leftmin -= 1
+                time_leftseconds = 59
+    if not pause and not stop:
+        time += 1
+# Create a frame and assign callbacks to event handlers
+frame = simplegui.create_frame("Keith Number Finder", 800, 200)
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(keys)
+
+# Start the frame animation
+frame.start()
