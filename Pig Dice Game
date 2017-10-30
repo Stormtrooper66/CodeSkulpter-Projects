@@ -1,0 +1,79 @@
+import simplegui
+import random
+
+points = [0,0]
+turn = "player"
+generated = 0
+rolled = 0
+message = " "
+choice = " "
+
+# Handler for mouse click
+def click():
+    global choice
+    choice = "roll"
+def click2():
+    global choice
+    choice = "hold"
+def restart():
+    global points,turn,generated,rolled,message,choice
+    points = [0,0]
+    turn = "player"
+    generated = 0
+    rolled = 0
+    message = " "
+    choice = " "
+def roll():
+    global rolled,generated,turn
+    rolled = random.randint(1,6)
+    generated += rolled
+    if rolled == 1:
+        generated = 0
+        if turn == "player":
+            turn = "computer"
+        elif turn == "computer":
+            turn = "player"
+def draw(canvas):
+    global message,choice,generated,turn
+    pointsplayer = points[0]
+    pointscomputer = points[1]
+    message = "Player: " + str(pointsplayer) + "    Computer: " + str(pointscomputer)
+    canvas.draw_text(message, [50,112], 48, "Red")
+    if points[0] >= 100:
+        canvas.draw_text("Player wins!", [50,162], 48, "Red")
+    if points[1] >= 100:
+        canvas.draw_text("Computer wins!", [50,162], 48, "Red")
+    canvas.draw_text("Rolled: " + str(rolled),[50,212],48,"Red")
+    if points[0] < 100 and points[1] < 100:
+        if turn == "player":
+            if choice == "roll":
+                roll()
+                choice = " "
+            if choice == "hold":
+                points[0] += generated
+                generated = 0 
+                choice = " "
+                turn = "computer"
+                roll()
+            canvas.draw_text("Hold or Roll?",[50,262],48,"Red")
+        elif turn == "computer":
+            roll()
+            choice = random.choice(["roll","roll","hold"])
+            if choice == "roll":
+                roll()
+                choice = " "
+            if choice == "hold":
+                points[1] += generated
+                generated = 0 
+                choice = " "
+                turn = "player"
+                roll()
+# Create a frame and assign callbacks to event handlers
+frame = simplegui.create_frame("Home", 800, 300)
+frame.add_button("Roll", click)
+frame.add_button("Hold", click2)
+frame.add_button("Restart",restart)
+frame.set_draw_handler(draw)
+
+# Start the frame animation
+frame.start()
